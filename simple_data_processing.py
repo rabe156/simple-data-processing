@@ -38,7 +38,7 @@ def ShowAll (List , Columns ) :
 
 def Filter(List ) :
     while True :
-        SearchFilter= input("which serach filtre you want to use :\ncity\ncategory\nminumum ratings\nminimum total value\nage\n")
+        SearchFilter= input("which serach filtre you want to use :\ncity\ncategory\nminumum ratings\nminimum total value\nage\nfor combining two filter entre combine \n")
         SearchFilter=SearchFilter.strip().lower()
         print(SearchFilter)
         if SearchFilter == "city" :
@@ -53,7 +53,7 @@ def Filter(List ) :
             SearchFilterVal= input("enter filter value\n")
             FilterMinRatings(List ,SearchFilterVal)
             break
-        elif SearchFilter == "Minimum total value" :
+        elif SearchFilter == "minimum total value" :
             SearchFilterVal= input("enter filter value\n")
             FilterMinTotalVal(List ,SearchFilterVal)
             break
@@ -61,6 +61,55 @@ def Filter(List ) :
             SearchFilterVal= input("enter filter value\n") 
             FilterAge(List ,SearchFilterVal)
             break
+        elif SearchFilter == "combine" :
+            Com=True
+            Dict={
+                "city" :FilterCity ,
+                "category" :FilterCategory ,
+                "minimum ratings" :FilterMinRatings ,
+                "minimum total value" :FilterMinTotalVal ,
+                "age" :FilterAge ,
+
+            }
+            First=input("enter your first filter \n").lower()
+            FirstVal=input("enter your first filter avlue  \n")
+            Second=input("second enter your second filter\n").lower()
+            SecondVal=input("second enter your second filter value\n")
+            operator = input ("which operator do you choose \nAND \nOR \n")
+            if operator == "OR" :
+                Firstop=[]
+                Firstop=Dict[First](List , FirstVal ,Com)
+                Secondop=[]
+                Secondop=Dict[Second](List , SecondVal ,Com)
+                seen_names=set()
+                or_result=[]
+                for item in (Firstop+Secondop) :
+                    if item["customer"] not in seen_names :
+                        or_result.append(item)
+                        seen_names.add(item["customer"])
+                if len(or_result) == 0 :
+                    print("there is no client \n")
+                else :
+                    print("the clients of this combined filter are :")
+                    for item in or_result :
+                        print(item["customer"])             
+
+            if operator == "AND" :
+                Firstop=[]
+                Firstop=Dict[First](List , FirstVal ,Com)
+                Secondop=[]
+                Secondop=Dict[Second](List , SecondVal ,Com)
+                NamesInS={item["customer"] for item in Secondop}
+                and_result=[item for item in Firstop if item["customer"] in NamesInS]
+                print(len(and_result))
+                if len(and_result) == 0 :
+
+                    print("there is no client \n")
+                else :
+                    print("the clients of this combined filter are :")
+                    for item in and_result :
+                        print(item["customer"])
+            break    
         else :  print("filtre does not exist enter a filter from the menu")
 def Statistics () :
     return
@@ -78,56 +127,61 @@ def count(List) :
     for item in List :
         total =total+1
     return total
-def FilterCity(List,Filter) :
+
+def FilterCity(List,Filter,Combine=False) :
     Filtred=[]
     Filtred=list(filter(lambda item : item.get("city") == Filter ,  List) )
-    if len(Filtred) == 0 :
+    if len(Filtred) == 0 and Combine == False :
         print ("sorry ther is no client from :",Filter,"\n")
-    else :
+    elif Combine == False:
         print ("the client from " ,Filter , "are : \n")
         for item in Filtred :
             print(item["customer"])
+    if Combine == True : return Filtred
   
-def FilterCategory(List , Filter):
+def FilterCategory(List , Filter,Combine=False):
     Filtred=[]
     Filtred=list(filter(lambda item : item.get("category") == Filter, List))
-    if len(Filtred) == 0 :
+    if len(Filtred) == 0 and Combine == False :
         print ("sorry ther is no client who has bought  :",Filter,"\n")
-    else :
+    elif Combine == False:
         print ("the client who bought" ,Filter , "are : \n")
         for item in Filtred :
             print(item["customer"])
-    
-def FilterMinRatings(List , Filter) :
+    if Combine == True : return Filtred
+
+def FilterMinRatings(List , Filter,Combine=False) :
     Filtred=[]
     Filtred=list(filter(lambda item : int(item.get("rating")) >= int(Filter) , List))
-    if len(Filtred) == 0 :
+    if  len(Filtred) == 0 and Combine == False :
         print ("sorry ther is no client who has   :",Filter,"\n")
-    else :
+    elif Combine == False:
         print ("the clients who has a rating above" ,Filter , "are : \n")
         for item in Filtred :
             print(item["customer"])
+    if Combine == True : return Filtred
 
-def FilterMinTotalVal(List , Filter) :
+def FilterMinTotalVal(List , Filter,Combine=False) :
     Filtred=[]
     Filtred=list(filter(lambda item : float(item.get("total")) >= float(Filter), List))
-    if len(Filtred) == 0 :
+    if len(Filtred) == 0 and Combine == False :
         print ("sorry ther is no client who has   :",Filter,"\n")
-    else :
+    elif Combine == False:
         print ("the clients who has a totale above" ,Filter , "are : \n")
         for item in Filtred :
             print(item["customer"])
+    if Combine == True : return Filtred
 
-def FilterAge(List ,Filter):
+def FilterAge(List ,Filter,Combine=False):
     Filtred=[]
     Filtred=list(filter(lambda item : int(item.get("age")) == int(Filter), List))
-    if len(Filtred) == 0 :
+    if len(Filtred) == 0 and Combine == False :
         print ("sorry ther is no client who has   :",Filter,"\n")
-    else :
+    elif Combine == False:
         print ("the clients who has " ,Filter , " years old are : \n")
         for item in Filtred :
             print(item["customer"])    
-    return
+    if Combine == True : return Filtred
 
 ###Programme
 
