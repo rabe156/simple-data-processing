@@ -40,7 +40,6 @@ def Filter(List ) :
     while True :
         SearchFilter= input("which serach filtre you want to use :\ncity\ncategory\nminumum ratings\nminimum total value\nage\nfor combining two filter entre combine \n")
         SearchFilter=SearchFilter.strip().lower()
-        print(SearchFilter)
         if SearchFilter == "city" :
             SearchFilterVal= input("enter filter value\n") 
             FilterCity(List ,SearchFilterVal)
@@ -111,12 +110,71 @@ def Filter(List ) :
                         print(item["customer"])
             break    
         else :  print("filtre does not exist enter a filter from the menu")
-def Statistics () :
+def Statistics (List) :
+    print("the statistics of this CSV file are : \n")
+    print("the average age is \n", AverageAge(List))
+    print("the average rating is \n", AverageRating(List))
+    print("the total of the quantiy sold is \n", TotalQuantity(List))
+    print("the total revenue is \n", TotalRevenue(List))
+    print("the minimum order value is \n", MinOrder(List))
+    print("the maximum order value is \n", MaxOrder(List))
     return
-def Sort() :
-    return
-def Find() :
-    return
+def Sort(List , Columns) :
+    while True :
+        Choice=input("Please choose a sorting option from the following \n1. Sort by price\n2. Sort by quantity\n3. Sort by rating\n4. Sort by age\n5. Sort by total value \n").strip().lower()
+        if Choice == "age" :
+            Choice2=input("Ascending Or Descending\n").capitalize()
+            Sorted=SortbyAge(List,Choice2)
+            ShowAll(Sorted , Columns)
+            break
+        elif Choice == "quantity" :
+            Choice2=input("Ascending Or Descending\n").capitalize()
+            Sorted=SortbyQuantity(List,Choice2)
+            ShowAll(Sorted , Columns)
+            break
+        elif Choice == "rating" :
+            Choice2=input("Ascending Or Descending\n").capitalize()
+            Sorted=SortbyRating(List,Choice2)
+            ShowAll(Sorted , Columns)
+            break
+        elif Choice == "price" :
+            Choice2=input("Ascending Or Descending\n").capitalize()
+            Sorted=SortbyPrice(List,Choice2)
+            ShowAll(Sorted , Columns)
+            break
+        elif Choice == "total value" :
+            Choice2=input("Ascending Or Descending\n").capitalize()
+            Sorted=SortbyTotalV(List,Choice2)
+            ShowAll(Sorted , Columns)
+            break
+        else : print("please enter a valid sort choice \n")
+
+def Find(List) :
+    while True :
+        Choice=input("choose from this list \n1. Find the most expensive order\n2. Find the cheapest order\n3. Find the highest-rated order\n4. Find orders by customer\n5. Find orders by product\n").strip().lower()
+        if Choice == "expensive ordre" :
+            Found=FindExpensive(List)
+            PrintFound(Found, Choice)
+            break
+        elif Choice == "cheapest ordre" :
+            Found=FindCheapest(List)
+            PrintFound(Found , Choice)
+            break
+        elif Choice == "highest-rated ordre" :
+            Found=FindHighRated(List)
+            PrintFound(Found , Choice)
+            break
+        elif Choice == "customer" :
+            Choice2=input("what customer you are looking for")
+            Found=FindCustomer(List,Choice2)
+            PrintFound(Found)
+            break
+        elif Choice == "Product" :
+            Choice2=input("what customer you are looking for")
+            Found=FindCustomer(List,Choice2)
+            PrintFound(Found)
+            break
+        else : ("please entre a find option from the list")
 def DatasetInfo () :
     return
 def Quit() :
@@ -183,6 +241,93 @@ def FilterAge(List ,Filter,Combine=False):
             print(item["customer"])    
     if Combine == True : return Filtred
 
+def AverageAge(List) :
+    TotalAge=0
+    count=0
+    for item in List :
+        TotalAge=TotalAge+int(item["age"])
+        count=count+1
+    return float(TotalAge/count)
+
+def AverageRating(List) :
+    TotalRating=0
+    count=0
+    for item in List :
+        TotalRating=TotalRating+int(item["rating"])
+        count=count+1
+    return float(TotalRating/count)
+
+def TotalQuantity(List) :
+    TotalQuantity=0
+    for item in List :
+        TotalQuantity=TotalQuantity+int(item["quantity"])
+    return float(TotalQuantity)
+
+def TotalRevenue(List) :
+    TotalRevenue=0
+    for item in List :
+        TotalRevenue=TotalRevenue+float(item["total"])
+    return float(TotalRevenue)
+
+def MinOrder(List) :
+    Values=[]
+    for item in List :
+        Values.append(float(item["total"]))
+    return min(Values)
+
+def MaxOrder(List) :
+    Values=[]
+    for item in List :
+        Values.append(float(item["total"]))
+    return max(Values)
+
+def SortbyAge(List , UInput) :
+    SortedList=sorted ( List , reverse=(UInput == "Descending") , key=lambda item : int(item["age"]) ) 
+    return SortedList
+
+def SortbyQuantity(List , UInput) :
+    SortedList=sorted ( List , reverse=(UInput == "Descending") , key=lambda item : int(item["quantity"]) ) 
+    return SortedList
+
+def SortbyRating(List , UInput) :
+    SortedList=sorted ( List , reverse=(UInput == "Descending") , key=lambda item : int(item["rating"]) ) 
+    return SortedList
+
+def SortbyPrice(List , UInput) :
+    SortedList=sorted ( List , reverse=(UInput == "Descending") , key=lambda item : float(item["unit_price"]) ) 
+    return SortedList
+
+def SortbyTotalV(List , UInput) :
+    SortedList=sorted ( List , reverse=(UInput == "Descending") , key=lambda item : float(item["total"]) ) 
+    return SortedList
+
+def FindExpensive(List) :
+    Value=[]
+    Max=MaxOrder(List)
+    print(Max)
+    Value=list(filter(lambda item :item.get("total")== Max,List))
+    return Value
+def FindCheapest(List) :
+    Value=[]
+    Value=min(List , key= lambda item : float(item.get("unit_price")))
+    return Value
+def FindHighRated(List) :
+    Value=[]
+    Value=min(List , key= lambda item : float(item.get("rating")))
+    return Value
+def FindCustomer(List , Customer) :
+    Value=[]
+    Value=list(filter(lambda item:item.get("customer")== Customer , List))
+    return Value
+def FindProduct(List , Product) :
+    Value=[]
+    Value=list(filter(lambda item:item.get("customer")== Product , List))
+    return Value
+def PrintFound(List , IValue ) :
+    print("---" , IValue ,"---\n")
+    for item in List:
+        for key , value in item.items() :
+            print(key ," = " ,value)
 ###Programme
 
 ###operation dictionary will be used to select the function 
@@ -210,8 +355,9 @@ while quit == False :
                     op=Menu(Rows,FileName)
                     if op == 7 : 
                         quit = True
-                    if op == 1 : Operations[op](ProcRows ,ProcColumns)
+                    if op == 1 or op == 4 : Operations[op](ProcRows ,ProcColumns)
                     if op ==2 : Operations[op](ProcRows)
+                    if op ==3 or op == 5 : Operations[op](ProcRows)
     except FileNotFoundError :
         print("enter a valid file name \n")
     except PermissionError :
