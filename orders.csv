@@ -6,7 +6,7 @@ order_id,customer,age,city,product,category,quantity,unit_price,rating
 1005,Karim,30,Setif,Chair,Furniture,4,95,3
 1006,Nadia,26,Oran,Phone,Electronics,1,520,5
 1007,Samir,37,Algiers,Monitor,Electronics,2,310,4
-1008,Amel,24,Tlemcen,Desk,Furniture,1,280,5
+1008,Amel,24,Tlemcen,Desk,28,1,280,5
 1009,Walid,45,Blida,Chair,Furniture,6,80,4
 1010,Imane,29,Oran,Laptop,Electronics,1,920,5
 1011,Youcef,33,Algiers,Keyboard,Electronics,2,65,3

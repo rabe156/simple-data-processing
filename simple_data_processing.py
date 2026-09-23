@@ -2,8 +2,7 @@
 import csv
 ###Main functions 
 def Menu (Dataset,DatasetName) :
-    DatasetName=''
-    print("========================================\n DATA ANALYZER\n========================================\nDataset:" ,DatasetName,"\nRecords:" ,count(Dataset),"\n1. Show all orders\n2. Filter orders\n3. Statistics\n4. Sort orders\n5. Find orders\n6. Dataset information\n7. Quit\n")
+    print("========================================\n DATA ANALYZER\n========================================\nDataset:" ,DatasetName,"\nRecords:" ,count(Dataset),"\n1. Show all orders\n2. Filter orders\n3. Statistics\n4. Sort orders\n5. Find orders\n7. Quit\n")
     while True :
         try :   
             op = int(input("Choose:\n"))
@@ -20,8 +19,12 @@ def LoadData(File) :
     Columns=CsvReader.fieldnames
     return Rows , Columns
 
-def ProcessData(List) :
-    for item in List :
+def ProcessData(List , CItem) :
+    for Row in List :
+        for item in CItem :
+            if Row.get(item) == '' :
+                Row[item]="0"
+    for item   in List :
         Total =float(item["quantity"])*float(item["unit_price"])
         item["total"]=str(Total)
     keys= list(List[0].keys()) 
@@ -156,7 +159,7 @@ def Find(List) :
             Found=FindExpensive(List)
             PrintFound(Found, Choice)
             break
-        elif Choice == "cheapest ordre" :
+        elif Choice == "cheapest order" :
             Found=FindCheapest(List)
             PrintFound(Found , Choice)
             break
@@ -165,14 +168,14 @@ def Find(List) :
             PrintFound(Found , Choice)
             break
         elif Choice == "customer" :
-            Choice2=input("what customer you are looking for")
+            Choice2=input("what customer you are looking for : \n")
             Found=FindCustomer(List,Choice2)
-            PrintFound(Found)
+            PrintFound(Found ,Choice2)
             break
-        elif Choice == "Product" :
-            Choice2=input("what customer you are looking for")
+        elif Choice == "product" :
+            Choice2=input("what product you are looking for : \n")
             Found=FindCustomer(List,Choice2)
-            PrintFound(Found)
+            PrintFound(Found , Choice2)
             break
         else : ("please entre a find option from the list")
 def DatasetInfo () :
@@ -349,7 +352,10 @@ while quit == False :
             FileName="orders.csv"
             with open(FileName, "r") as file :
                 Rows,Columns= LoadData(file)
-                ProcRows , ProcColumns =ProcessData(Rows)
+                if len(Rows) == 0 :
+                    print("data set is empty please entre another dataset") 
+                    continue
+                ProcRows , ProcColumns =ProcessData(Rows ,Columns)
                 ###the main loop to display the menu until the user quits 
                 while quit == False :
                     op=Menu(Rows,FileName)
