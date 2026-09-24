@@ -89,8 +89,8 @@ def Filter(List ) :
             FirstVal=input("enter your first filter avlue  \n")
             Second=input("second enter your second filter\n").lower()
             SecondVal=input("second enter your second filter value\n")
-            operator = input ("which operator do you choose \nAND \nOR \n")
-            if operator == "OR" :
+            operator = input ("which operator do you choose \nAND \nOR \n").lower().strip()
+            if operator == "or" :
                 Firstop=[]
                 Firstop=Dict[First](List , FirstVal ,Com)
                 Secondop=[]
@@ -108,7 +108,7 @@ def Filter(List ) :
                     for item in or_result :
                         print(item)             
 
-            if operator == "AND" :
+            if operator == "and" :
                 Firstop=[]
                 Firstop=Dict[First](List , FirstVal ,Com)
                 Secondop=[]
@@ -175,7 +175,7 @@ def Find(List) :
             Found=FindCheapest(List)
             PrintFound(Found , Choice)
             break
-        elif Choice == "highest-rated ordre" or Choice == "3"  :
+        elif Choice == "highest-rated order" or Choice == "3"  :
             Found=FindHighRated(List)
             PrintFound(Found , Choice)
             break
@@ -225,9 +225,9 @@ def Validation(List , Schema , RNumber) :
                 f"{Dictkey} must be ,got '{Value}'"
             )
             continue
-        if min in DictValue and ConvertedValue < DictValue["min"] :
+        if "min" in DictValue and ConvertedValue < DictValue["min"] :
             RErrors.append(f"{Dictkey} can not be less than {DictValue['min']}")
-        if min in DictValue and ConvertedValue > DictValue["max"] :
+        if "max" in DictValue and ConvertedValue > DictValue["max"] :
             RErrors.append(f"{Dictkey} can not be less than {DictValue['max']}")    
 
     return RErrors
@@ -420,7 +420,7 @@ while quit == False :
                 ProcRows , ProcColumns =ProcessData(Valid ,Columns)
                 ###the main loop to display the menu until the user quits 
                 while quit == False :
-                    op=Menu(Rows,FileName)
+                    op=Menu(ProcRows,FileName)
                     if op == 7 : 
                         quit = True
                     if op == 1 or op == 4 : Operations[op](ProcRows ,ProcColumns)
