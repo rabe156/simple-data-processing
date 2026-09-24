@@ -19,11 +19,23 @@ def LoadData(File) :
     Columns=CsvReader.fieldnames
     return Rows , Columns
 
+def CleanData(List , Schema) :
+    ValidRows=[]
+    Errors=[]
+    for Rownumber ,Row in enumerate(List , start=2) :
+        RowErrors=Validation(Row , Schema ,Rownumber)
+        if len(RowErrors) == 0 :
+            ValidRows.append(Row)
+        else : Errors.extend(RowErrors)
+
+    return ValidRows , Errors
+
 def ProcessData(List , CItem) :
     for Row in List :
         for item in CItem :
             if Row.get(item) == '' :
                 Row[item]="0"
+
     for item   in List :
         Total =float(item["quantity"])*float(item["unit_price"])
         item["total"]=str(Total)
@@ -86,31 +98,31 @@ def Filter(List ) :
                 seen_names=set()
                 or_result=[]
                 for item in (Firstop+Secondop) :
-                    if item["customer"] not in seen_names :
+                    if item["order_id"] not in seen_names :
                         or_result.append(item)
-                        seen_names.add(item["customer"])
+                        seen_names.add(item["order_id"])
                 if len(or_result) == 0 :
-                    print("there is no client \n")
+                    print("there is no order \n")
                 else :
-                    print("the clients of this combined filter are :")
+                    print("the orders of this combined filter are :")
                     for item in or_result :
-                        print(item["customer"])             
+                        print(item)             
 
             if operator == "AND" :
                 Firstop=[]
                 Firstop=Dict[First](List , FirstVal ,Com)
                 Secondop=[]
                 Secondop=Dict[Second](List , SecondVal ,Com)
-                NamesInS={item["customer"] for item in Secondop}
-                and_result=[item for item in Firstop if item["customer"] in NamesInS]
+                NamesInS={item["order_id"] for item in Secondop}
+                and_result=[item for item in Firstop if item["order_id"] in NamesInS]
                 print(len(and_result))
                 if len(and_result) == 0 :
 
-                    print("there is no client \n")
+                    print("there is no order \n")
                 else :
-                    print("the clients of this combined filter are :")
+                    print("the order of this combined filter are :")
                     for item in and_result :
-                        print(item["customer"])
+                        print(item)
             break    
         else :  print("filtre does not exist enter a filter from the menu")
 def Statistics (List) :
@@ -124,28 +136,28 @@ def Statistics (List) :
     return
 def Sort(List , Columns) :
     while True :
-        Choice=input("Please choose a sorting option from the following \n1. Sort by price\n2. Sort by quantity\n3. Sort by rating\n4. Sort by age\n5. Sort by total value \n").strip().lower()
-        if Choice == "age" :
+        Choice=input("Please choose a sorting option from the following \n1. price\n2. quantity\n3.  rating\n4.  age\n5.  total value \n").strip().lower()
+        if Choice == "age" or Choice == "4" :
             Choice2=input("Ascending Or Descending\n").capitalize()
             Sorted=SortbyAge(List,Choice2)
             ShowAll(Sorted , Columns)
             break
-        elif Choice == "quantity" :
+        elif Choice == "quantity" or Choice == "2":
             Choice2=input("Ascending Or Descending\n").capitalize()
             Sorted=SortbyQuantity(List,Choice2)
             ShowAll(Sorted , Columns)
             break
-        elif Choice == "rating" :
+        elif Choice == "rating" or Choice == "3":
             Choice2=input("Ascending Or Descending\n").capitalize()
             Sorted=SortbyRating(List,Choice2)
             ShowAll(Sorted , Columns)
             break
-        elif Choice == "price" :
+        elif Choice == "price" or Choice == "1":
             Choice2=input("Ascending Or Descending\n").capitalize()
             Sorted=SortbyPrice(List,Choice2)
             ShowAll(Sorted , Columns)
             break
-        elif Choice == "total value" :
+        elif Choice == "total value" or Choice == "5":
             Choice2=input("Ascending Or Descending\n").capitalize()
             Sorted=SortbyTotalV(List,Choice2)
             ShowAll(Sorted , Columns)
@@ -154,30 +166,30 @@ def Sort(List , Columns) :
 
 def Find(List) :
     while True :
-        Choice=input("choose from this list \n1. Find the most expensive order\n2. Find the cheapest order\n3. Find the highest-rated order\n4. Find orders by customer\n5. Find orders by product\n").strip().lower()
-        if Choice == "expensive ordre" :
+        Choice=input("choose from this list \n1.expensive order\n2.cheapest order\n3.highest-rated order\n4.customer\n5.product\n").strip().lower()
+        if Choice == "expensive order" or Choice == "1" :
             Found=FindExpensive(List)
             PrintFound(Found, Choice)
             break
-        elif Choice == "cheapest order" :
+        elif Choice == "cheapest order" or Choice == "2"  :
             Found=FindCheapest(List)
             PrintFound(Found , Choice)
             break
-        elif Choice == "highest-rated ordre" :
+        elif Choice == "highest-rated ordre" or Choice == "3"  :
             Found=FindHighRated(List)
             PrintFound(Found , Choice)
             break
-        elif Choice == "customer" :
+        elif Choice == "customer" or Choice == "4" :
             Choice2=input("what customer you are looking for : \n")
             Found=FindCustomer(List,Choice2)
             PrintFound(Found ,Choice2)
             break
-        elif Choice == "product" :
+        elif Choice == "product" or Choice == "5" :
             Choice2=input("what product you are looking for : \n")
-            Found=FindCustomer(List,Choice2)
+            Found=FindProduct(List,Choice2)
             PrintFound(Found , Choice2)
             break
-        else : ("please entre a find option from the list")
+        else : print("please entre a find option from the list")
 def DatasetInfo () :
     return
 def Quit() :
@@ -188,6 +200,37 @@ def count(List) :
     for item in List :
         total =total+1
     return total
+
+def Validation(List , Schema , RNumber) :
+    RErrors =[]
+    for Dictkey , DictValue in Schema.items() :
+        Value = List.get(Dictkey) 
+        if Value is None :
+            RErrors.append(f"missing column : {Dictkey}")
+            continue
+        Value=Value.strip()
+        if Value == '' :
+            if DictValue["required"] == True :
+                RErrors.append(f"{Dictkey} is empty")
+                continue
+        try :
+            if DictValue["type"] == int :
+                ConvertedValue = int(Value)
+            elif DictValue["type"] == float :
+                ConvertedValue =float(Value)
+            elif DictValue["type"] == str :
+                ConvertedValue=Value
+        except ValueError :
+            RErrors.append(
+                f"{Dictkey} must be ,got '{Value}'"
+            )
+            continue
+        if min in DictValue and ConvertedValue < DictValue["min"] :
+            RErrors.append(f"{Dictkey} can not be less than {DictValue['min']}")
+        if min in DictValue and ConvertedValue > DictValue["max"] :
+            RErrors.append(f"{Dictkey} can not be less than {DictValue['max']}")    
+
+    return RErrors
 
 def FilterCity(List,Filter,Combine=False) :
     Filtred=[]
@@ -308,23 +351,25 @@ def FindExpensive(List) :
     Value=[]
     Max=MaxOrder(List)
     print(Max)
-    Value=list(filter(lambda item :item.get("total")== Max,List))
+    Value=list(filter(lambda item :float(item.get("total")) == Max,List))
     return Value
 def FindCheapest(List) :
-    Value=[]
-    Value=min(List , key= lambda item : float(item.get("unit_price")))
-    return Value
+    ValueL=[]
+    Value=list(min(List , key= lambda item : float(item.get("total"))))
+    ValueL.append(Value)
+    return ValueL
 def FindHighRated(List) :
-    Value=[]
-    Value=min(List , key= lambda item : float(item.get("rating")))
-    return Value
+    ValueL=[]
+    Value=max(List , key= lambda item : float(item.get("rating")))
+    ValueL.append(Value)
+    return ValueL
 def FindCustomer(List , Customer) :
     Value=[]
     Value=list(filter(lambda item:item.get("customer")== Customer , List))
     return Value
 def FindProduct(List , Product) :
     Value=[]
-    Value=list(filter(lambda item:item.get("customer")== Product , List))
+    Value=list(filter(lambda item:item.get("product")== Product , List))
     return Value
 def PrintFound(List , IValue ) :
     print("---" , IValue ,"---\n")
@@ -346,6 +391,17 @@ Operations={
 ###load and process the data 
 quit = False
 end=False
+Schema={
+    "order_id":{"type" : int , "required" :True},
+    "customer": {"type": str, "required": True},
+    "age": {"type": int, "required": True, "min": 0, "max": 120},
+    "city": {"type": str, "required": True},
+    "category": {"type": str, "required": True},
+    "product": {"type": str, "required": True},
+    "quantity": {"type": int, "required": True, "min": 0},
+    "unit_price": {"type": float, "required": True, "min": 0},
+    "rating": {"type": int, "required": True, "min": 1, "max": 5}
+}
 while quit == False :
     try :
             ###FileName=input("which data set you want to treat : \n")
@@ -355,7 +411,13 @@ while quit == False :
                 if len(Rows) == 0 :
                     print("data set is empty please entre another dataset") 
                     continue
-                ProcRows , ProcColumns =ProcessData(Rows ,Columns)
+                Valid ,Errors = CleanData(Rows , Schema)
+                print("\nvalid rows are : " , len(Valid))
+                print("\n invalid rows are :" ,len(Errors))
+                for Error in Errors :
+                    print(Error)
+                    print("end invalid")
+                ProcRows , ProcColumns =ProcessData(Valid ,Columns)
                 ###the main loop to display the menu until the user quits 
                 while quit == False :
                     op=Menu(Rows,FileName)
